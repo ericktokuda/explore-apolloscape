@@ -8,11 +8,10 @@ import os
 from os.path import join as pjoin
 import inspect
 
-import sys
+import sys, shutil, re
 import numpy as np
 import matplotlib; matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-import re
 import pandas as pd
 from PIL import Image
 import subprocess
@@ -23,6 +22,7 @@ def generate_video(frameids, ext, framedir, res, outpath):
     """Generate a video considering the given frames"""
     info(inspect.stack()[0][3] + '()')
     tmpdir = '/tmp/thisisatemporaryfolder/'
+    if os.path.isdir(tmpdir): shutil.rmtree(tmpdir)
     os.makedirs(tmpdir, exist_ok=True)
 
     i = 0
@@ -35,7 +35,7 @@ def generate_video(frameids, ext, framedir, res, outpath):
         img.thumbnail((res, res), Image.ANTIALIAS) # resizes 512x512 to 256x256
         img.save(pjoin(tmpdir, '{:04d}.png'.format(i)))
         i += 1
-    cmd = '''ffmpeg -i {}/%03d.png {}'''.format(tmpdir, outpath)
+    cmd = '''ffmpeg -i {}/%04d.png {}'''.format(tmpdir, outpath)
     subprocess.check_output(cmd, shell=True)
 
 ##########################################################
