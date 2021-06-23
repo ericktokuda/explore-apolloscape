@@ -58,7 +58,7 @@ def parse_masks(maskdir, labels, outpath):
     i = 0
     for f in allfiles:
         if 'instanceIds' in f or '.json' in f: continue
-        files.append(f.replace('_bin.png', ''))
+        files.append(f.replace('_bin', '').replace('.png', ''))
         mask = imageio.imread(f)
         uvals, count = np.unique(mask, return_counts=True)
         for uval in uvals: objs[i, ids.index(uval)] = 1
