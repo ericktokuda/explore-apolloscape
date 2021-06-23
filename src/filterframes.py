@@ -21,6 +21,10 @@ from myutils import info, create_readme
 def generate_video(frameids, ext, framedir, res, outpath):
     """Generate a video considering the given frames"""
     info(inspect.stack()[0][3] + '()')
+
+    overwrite = False
+    if not overwrite and os.path.isfile(outpath): return False
+
     tmpdir = '/tmp/thisisatemporaryfolder/'
     if os.path.isdir(tmpdir): shutil.rmtree(tmpdir)
     os.makedirs(tmpdir, exist_ok=True)
