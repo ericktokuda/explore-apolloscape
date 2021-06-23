@@ -41,6 +41,7 @@ def main(rootdir, outdir):
             if (not rec.startswith('Record')) or (not os.path.isdir(recdir)):
                 info('0:{}, {}'.format(rec, recdir))
                 continue
+            info('recdir:{}'.format(recdir))
             maskdir = pjoin(recdir, camera)
             outpath = pjoin(outdir, 'road{}_rec{}.csv'.format(
                 roadidstr, recidstr))
@@ -49,7 +50,7 @@ def main(rootdir, outdir):
 ##########################################################
 def parse_masks(maskdir, labels, outpath):
     """Parse all masks in @maskdir and output a csv in @outdir"""
-    info(inspect.stack()[0][3] + '()')
+    # info(inspect.stack()[0][3] + '()')
     ids = list(labels.keys())
     nlabels = len(ids)
     os.chdir(maskdir)
