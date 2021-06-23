@@ -14,34 +14,50 @@ import matplotlib; matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import pandas as pd
 import imageio
-from labels_apollo import labels
+from external.labels_apollo import labels as apollolabels
 from myutils import info, create_readme
 
 ##########################################################
 def main(rootdir, outdir):
     """Main call"""
     info(inspect.stack()[0][3] + '()')
-    names = {} # Load the apolloscape labels
-    for l in labels:
-        if l.clsId in names.keys(): continue
-        names[l.clsId] = l.name
-    ids = list(names.keys())
+    labels = {} # Load the apolloscape labels
+    for l in apollolabels:
+        if l.clsId in labels.keys(): continue
+        labels[l.clsId] = l.name
+
+    camera = 'Camera 5' # Just picking one of the cameras
+
+    for r in sorted(os.listdir(rootdir)):
+        roaddir = pjoin(rootdir, r)
+        if (not r.endswith('_ins')) or (not os.path.isdir(roaddir)):
+            info('0:{}, {}'.format(r, roaddir))
+            continue
+        roadidstr = r.replace('road', '').replace('_ins', '')
+        labeldir = pjoin(roaddir, 'Label')
+        for rec in os.listdir(labeldir):
+            recdir = pjoin(labeldir, rec)
+            recidstr = rec.replace('Record', '')
+            if (not rec.startswith('Record')) or (not os.path.isdir(recdir)):
+                info('0:{}, {}'.format(rec, recdir))
+                continue
+            maskdir = pjoin(recdir, camera)
+            outpath = pjoin(outdir, 'road{}_rec{}.csv'.format(
+                roadidstr, recidstr))
+            parse_masks(maskdir, labels, outpath)
+
+##########################################################
+def parse_masks(maskdir, labels, outpath):
+    """Parse all masks in @maskdir and output a csv in @outdir"""
+    info(inspect.stack()[0][3] + '()')
+    ids = list(labels.keys())
     nlabels = len(ids)
-
-    roadid = 2
-    recordid = 18
-    camid = 5
-    maskdir = pjoin(rootdir, 'road{:02d}_ins'.format(roadid), 'Label',
-                    'Record{:03d}'.format(recordid),
-                    'Camera {}'.format(camid))
-    info('maskdir:{}'.format(maskdir))
-
     os.chdir(maskdir)
     allfiles = sorted(os.listdir(maskdir))
     files = []
     objs = np.zeros((len(allfiles), nlabels), dtype=int)
     i = 0
-    for f in allfiles[:5]:
+    for f in allfiles:
         if 'instanceIds' in f or '.json' in f: continue
         files.append(f.replace('_bin.png', ''))
         mask = imageio.imread(f)
@@ -49,11 +65,9 @@ def main(rootdir, outdir):
         for uval in uvals: objs[i, ids.index(uval)] = 1
         i += 1
 
-    df = pd.DataFrame(objs[:i, :], columns=names.values())
+    df = pd.DataFrame(objs[:i, :], columns=labels.values())
     df['file'] = files
-    df = df.reindex(columns=['file']+list(names.values()))
-    outpath = pjoin(outdir, 'roa{:02d}_rec{:02d}_cam{}.csv'.format(
-        roadid, recordid, camid))
+    df = df.reindex(columns=['file']+list(labels.values()))
     df.to_csv(outpath, index=False)
 
 ##########################################################
