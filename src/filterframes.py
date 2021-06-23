@@ -35,8 +35,12 @@ def generate_video(frameids, ext, framedir, res, outpath):
         img.thumbnail((res, res), Image.ANTIALIAS) # resizes 512x512 to 256x256
         img.save(pjoin(tmpdir, '{:04d}.png'.format(i)))
         i += 1
+
+    if i == 0: return False
+
     cmd = '''ffmpeg -i {}/%04d.png {}'''.format(tmpdir, outpath)
     subprocess.check_output(cmd, shell=True)
+    return True
 
 ##########################################################
 def main(csvdir, datasetdir, outdir):
@@ -46,6 +50,8 @@ def main(csvdir, datasetdir, outdir):
     camid = 5
     res = 640
     ext = '.jpg'
+    minsize = 100
+
     for f in sorted(os.listdir(csvdir)):
         if not f.endswith('.csv'): continue
         info('{}'.format(f))
@@ -59,7 +65,7 @@ def main(csvdir, datasetdir, outdir):
         outpathorig = pjoin(outdir, filename)
         generate_video(df.file.tolist(), ext, framedir, res, outpathorig)
         for _cls in classes:
-            frameids = df.loc[df[_cls] == 1].file.tolist()
+            frameids = df.loc[df[_cls] > minsize].file.tolist()
             outpath = outpathorig.replace('.gif', '_{}.gif'.format(_cls))
             generate_video(frameids, ext, framedir, res, outpath)
 
