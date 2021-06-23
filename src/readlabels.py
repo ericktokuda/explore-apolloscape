@@ -34,7 +34,7 @@ def main(rootdir, outdir):
             continue
         roadidstr = r.replace('road', '').replace('_ins', '')
         labeldir = pjoin(roaddir, 'Label')
-        for rec in os.listdir(labeldir):
+        for rec in sorted(os.listdir(labeldir)):
             recdir = pjoin(labeldir, rec)
             recidstr = rec.replace('Record', '')
             if (not rec.startswith('Record')) or (not os.path.isdir(recdir)):
