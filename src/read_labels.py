@@ -31,7 +31,6 @@ def main(rootdir, outdir):
     for r in sorted(os.listdir(rootdir)):
         roaddir = pjoin(rootdir, r)
         if (not r.endswith('_ins')) or (not os.path.isdir(roaddir)):
-            info('0:{}, {}'.format(r, roaddir))
             continue
         roadidstr = r.replace('road', '').replace('_ins', '')
         labeldir = pjoin(roaddir, 'Label')
@@ -39,9 +38,8 @@ def main(rootdir, outdir):
             recdir = pjoin(labeldir, rec)
             recidstr = rec.replace('Record', '')
             if (not rec.startswith('Record')) or (not os.path.isdir(recdir)):
-                info('0:{}, {}'.format(rec, recdir))
                 continue
-            info('recdir:{}'.format(recdir))
+            info('{}'.format(recdir))
             maskdir = pjoin(recdir, camera)
             outpath = pjoin(outdir, 'road{}_rec{}.csv'.format(
                 roadidstr, recidstr))
