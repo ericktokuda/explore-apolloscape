@@ -56,11 +56,11 @@ def main(csvdir, datasetdir, outdir):
                          'Record{}'.format(recordid), 'Camera {}'.format(camid))
         df = pd.read_csv(csvpath)
         filename = '{}.gif'.format(f.replace('.csv', ''))
-        outpath = pjoin(outdir, filename)
-        generate_video(df.file.tolist(), ext, framedir, res, outpath)
+        outpathorig = pjoin(outdir, filename)
+        generate_video(df.file.tolist(), ext, framedir, res, outpathorig)
         for _cls in classes:
             frameids = df.loc[df[_cls] == 1].file.tolist()
-            outpath = outpath.replace('.gif', '_{}.gif'.format(_cls))
+            outpath = outpathorig.replace('.gif', '_{}.gif'.format(_cls))
             generate_video(frameids, ext, framedir, res, outpath)
 
 ##########################################################
